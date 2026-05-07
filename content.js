@@ -19,6 +19,8 @@ const state = {
   activeCorner: CORNERS[1],
   isEditorOpen: false,
   isHistoryOpen: false,
+  isMoving: false,
+  lastMoveAt: 0,
 };
 
 const storage = {
@@ -46,7 +48,7 @@ root.innerHTML = `
       </div>
       <div class="task-bubble-body">
         <div class="task-bubble-task"></div>
-        <div class="task-bubble-tip">Click the bubble if it’s in the way and it’ll move.</div>
+        <div class="task-bubble-tip">If your cursor bumps into it, it glides to another corner.</div>
       </div>
       <div class="task-bubble-panel task-bubble-editor-panel">
         <textarea class="task-bubble-textarea" placeholder="Finish finding jobs"></textarea>
@@ -138,9 +140,20 @@ const applyCorner = async (corner) => {
 };
 
 const moveToRandomCorner = async () => {
+  if (state.isMoving) return;
+
+  state.isMoving = true;
+  state.lastMoveAt = Date.now();
+  shell.classList.add("is-gliding");
+
   const candidates = CORNERS.filter((corner) => corner !== state.activeCorner);
   const nextCorner = candidates[Math.floor(Math.random() * candidates.length)] || CORNERS[0];
   await applyCorner(nextCorner);
+
+  window.setTimeout(() => {
+    state.isMoving = false;
+    shell.classList.remove("is-gliding");
+  }, 560);
 };
 
 const openEditor = () => {
@@ -226,11 +239,23 @@ root.addEventListener("click", async (event) => {
       return;
     }
   }
+});
 
-  const clickedInsideCard = event.target.closest(".task-bubble-card");
-  const clickedPanelControl = event.target.closest("button, textarea");
+window.addEventListener("mousemove", async (event) => {
+  if (state.isEditorOpen || state.isHistoryOpen || state.isMoving) {
+    return;
+  }
 
-  if (clickedInsideCard && !clickedPanelControl && !state.isEditorOpen && !state.isHistoryOpen) {
+  if (Date.now() - state.lastMoveAt < 900) {
+    return;
+  }
+
+  const rect = shell.getBoundingClientRect();
+  const padding = 14;
+  const insideX = event.clientX >= rect.left - padding && event.clientX <= rect.right + padding;
+  const insideY = event.clientY >= rect.top - padding && event.clientY <= rect.bottom + padding;
+
+  if (insideX && insideY) {
     await moveToRandomCorner();
   }
 });
