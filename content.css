@@ -1,0 +1,196 @@
+:root {
+  --task-bubble-bg: rgba(24, 24, 27, 0.42);
+  --task-bubble-border: rgba(255, 255, 255, 0.24);
+  --task-bubble-text: rgba(255, 255, 255, 0.96);
+  --task-bubble-subtle: rgba(255, 255, 255, 0.72);
+  --task-bubble-shadow: 0 14px 40px rgba(0, 0, 0, 0.22);
+}
+
+#task-bubble-root {
+  all: initial;
+}
+
+#task-bubble-root * {
+  box-sizing: border-box;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.task-bubble-shell {
+  position: fixed;
+  z-index: 2147483647;
+  width: 280px;
+  max-width: calc(100vw - 24px);
+  color: var(--task-bubble-text);
+  transition: top 180ms ease, right 180ms ease, bottom 180ms ease, left 180ms ease, opacity 160ms ease, transform 160ms ease;
+}
+
+.task-bubble-shell.corner-top-left {
+  top: 12px;
+  left: 12px;
+}
+
+.task-bubble-shell.corner-top-right {
+  top: 12px;
+  right: 12px;
+}
+
+.task-bubble-shell.corner-bottom-left {
+  bottom: 12px;
+  left: 12px;
+}
+
+.task-bubble-shell.corner-bottom-right {
+  bottom: 12px;
+  right: 12px;
+}
+
+.task-bubble-card {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: var(--task-bubble-bg);
+  border: 1px solid var(--task-bubble-border);
+  border-radius: 20px;
+  box-shadow: var(--task-bubble-shadow);
+  overflow: hidden;
+}
+
+.task-bubble-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px 8px;
+}
+
+.task-bubble-title {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--task-bubble-subtle);
+}
+
+.task-bubble-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.task-bubble-button {
+  appearance: none;
+  border: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--task-bubble-text);
+  border-radius: 999px;
+  padding: 6px 9px;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.task-bubble-button:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.task-bubble-body {
+  padding: 0 12px 12px;
+}
+
+.task-bubble-task {
+  font-size: 15px;
+  line-height: 1.35;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.task-bubble-empty {
+  color: var(--task-bubble-subtle);
+  font-style: italic;
+}
+
+.task-bubble-tip {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--task-bubble-subtle);
+}
+
+.task-bubble-panel {
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: none;
+}
+
+.task-bubble-panel.open {
+  display: block;
+}
+
+.task-bubble-textarea {
+  width: 100%;
+  min-height: 84px;
+  resize: vertical;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--task-bubble-text);
+  padding: 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.task-bubble-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.task-bubble-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.task-bubble-save {
+  background: rgba(74, 222, 128, 0.28);
+}
+
+.task-bubble-cancel {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.task-bubble-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 240px;
+  overflow: auto;
+}
+
+.task-bubble-history-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.task-bubble-history-entry {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 10px;
+  font-size: 13px;
+  color: var(--task-bubble-text);
+  cursor: pointer;
+}
+
+.task-bubble-history-entry:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.task-bubble-history-meta {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--task-bubble-subtle);
+}
+
+.task-bubble-history-empty {
+  font-size: 13px;
+  color: var(--task-bubble-subtle);
+}
