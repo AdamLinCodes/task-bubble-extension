@@ -15,10 +15,10 @@ A small Chrome extension that keeps your current task visible in a translucent f
 
 ## Default shortcuts
 
-- Edit task: `Ctrl+Shift+Y` (`Ctrl+Shift+Y` on macOS)
-- Toggle history and queue: `Ctrl+Shift+J` (`Ctrl+Shift+J` on macOS)
-- Mark current task done: `Ctrl+Shift+D` (`Ctrl+Shift+D` on macOS)
-- Pause or resume timer: `Ctrl+Shift+P` (`Ctrl+Shift+P` on macOS)
+- Edit task: `Ctrl+Shift+Y` (`Control+Shift+Y` on macOS)
+- Toggle history and queue: `Ctrl+Shift+J` (`Control+Shift+J` on macOS)
+- Mark current task done: `Ctrl+Shift+D` (`Control+Shift+D` on macOS)
+- Pause or resume timer: `Ctrl+Shift+P` (`Control+Shift+P` on macOS)
 
 You can change all shortcuts in Chrome at:
 

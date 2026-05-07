@@ -14,28 +14,28 @@
     "edit-task-bubble": {
       "suggested_key": {
         "default": "Ctrl+Shift+Y",
-        "mac": "Ctrl+Shift+Y"
+        "mac": "MacCtrl+Shift+Y"
       },
       "description": "Edit the current task bubble text"
     },
     "toggle-task-history": {
       "suggested_key": {
         "default": "Ctrl+Shift+J",
-        "mac": "Ctrl+Shift+J"
+        "mac": "MacCtrl+Shift+J"
       },
       "description": "Show or hide task history and queue"
     },
     "complete-task-bubble": {
       "suggested_key": {
         "default": "Ctrl+Shift+D",
-        "mac": "Ctrl+Shift+D"
+        "mac": "MacCtrl+Shift+D"
       },
       "description": "Mark the current task done and move to the next queued task"
     },
     "toggle-task-timer": {
       "suggested_key": {
         "default": "Ctrl+Shift+P",
-        "mac": "Ctrl+Shift+P"
+        "mac": "MacCtrl+Shift+P"
       },
       "description": "Pause or resume the task timer"
     }
