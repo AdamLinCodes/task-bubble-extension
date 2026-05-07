@@ -150,9 +150,17 @@
   cursor: pointer;
 }
 
+.task-bubble-history-static {
+  cursor: default;
+}
+
 .task-bubble-history-entry:hover,
 .task-bubble-mini-button:hover {
   background: rgba(255, 255, 255, 0.14);
+}
+
+.task-bubble-history-static:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .task-bubble-history-entry-block {

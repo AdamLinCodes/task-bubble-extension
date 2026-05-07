@@ -278,22 +278,29 @@ const renderHistory = () => {
     return;
   }
 
-  state.history.forEach((entry) => {
-    const button = document.createElement("button");
-    button.className = "task-bubble-history-entry task-bubble-history-entry-block";
-    button.type = "button";
-    button.innerHTML = `
+  state.history.forEach((entry, index) => {
+    const item = document.createElement("div");
+    item.className = "task-bubble-list-item";
+
+    const content = document.createElement("div");
+    content.className = "task-bubble-history-entry task-bubble-history-entry-block task-bubble-history-static";
+    content.innerHTML = `
       <div>${entry.text}</div>
       <span class="task-bubble-history-meta">${formatDuration(entry.elapsedMs || 0)} · ${new Date(entry.savedAt).toLocaleString()}</span>
     `;
-    button.addEventListener("click", async () => {
-      state.currentTask = entry.text;
-      renderTask();
-      await storage.set({ [STORAGE_KEYS.task]: state.currentTask });
-      await startTimerForCurrentTask();
-      closeHistory();
+
+    const clearButton = document.createElement("button");
+    clearButton.type = "button";
+    clearButton.className = "task-bubble-mini-button";
+    clearButton.textContent = "Clear";
+    clearButton.addEventListener("click", async () => {
+      state.history.splice(index, 1);
+      renderHistory();
+      await storage.set({ [STORAGE_KEYS.history]: state.history });
     });
-    historyList.appendChild(button);
+
+    item.append(content, clearButton);
+    historyList.appendChild(item);
   });
 };
 
