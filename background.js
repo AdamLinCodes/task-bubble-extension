@@ -17,6 +17,14 @@ chrome.commands.onCommand.addListener(async (command) => {
   if (command === "toggle-task-history") {
     await broadcastToActiveTab({ type: "TASK_BUBBLE_TOGGLE_HISTORY" });
   }
+
+  if (command === "complete-task-bubble") {
+    await broadcastToActiveTab({ type: "TASK_BUBBLE_COMPLETE_TASK" });
+  }
+
+  if (command === "toggle-task-timer") {
+    await broadcastToActiveTab({ type: "TASK_BUBBLE_TOGGLE_TIMER" });
+  }
 });
 
 chrome.action.onClicked.addListener(async () => {

@@ -4,18 +4,23 @@ A small Chrome extension that keeps your current task visible in a translucent f
 
 ## Features
 
-- Translucent floating task bubble on all pages
-- Keyboard shortcut to edit the task text
-- Hidden task history that only appears when requested
+- Minimal floating task bubble on all pages
+- Bubble glides away when your cursor bumps into it
+- Keyboard shortcut to edit the current task
+- Queue support for upcoming tasks
+- Done shortcut that advances to the next queued task
+- Built-in timer with pause/resume support
+- Hidden queue and completed-task history panel
 - Local persistence using extension storage
-- Bubble jumps to a different corner when clicked so it gets out of the way quickly
 
 ## Default shortcuts
 
 - Edit task: `Ctrl+Shift+Y` (`Command+Shift+Y` on macOS)
-- Toggle history: `Ctrl+Shift+H` (`Command+Shift+H` on macOS)
+- Toggle history and queue: `Ctrl+Shift+J` (`Command+Shift+J` on macOS)
+- Mark current task done: `Ctrl+Shift+D` (`Command+Shift+D` on macOS)
+- Pause or resume timer: `Ctrl+Shift+P` (`Command+Shift+P` on macOS)
 
-You can change both in Chrome at:
+You can change all shortcuts in Chrome at:
 
 `chrome://extensions/shortcuts`
 
@@ -29,5 +34,7 @@ You can change both in Chrome at:
 ## Usage
 
 - Click the extension icon or use the edit shortcut to update the current task
-- Click **History** to show or hide previous tasks
-- Click the bubble itself if it is in the way and it will jump to another corner
+- Add future tasks in the queue box, one per line
+- Use the done shortcut to mark the current task complete and pull in the next queued task
+- Use the history shortcut to open the queue and completed-task history panel
+- Click a completed task to reuse it

@@ -1,22 +1,31 @@
 const STORAGE_KEYS = {
   task: "taskBubble.currentTask",
+  queue: "taskBubble.queue",
   history: "taskBubble.history",
   corner: "taskBubble.corner",
+  timer: "taskBubble.timer",
 };
 
 const CORNERS = ["top-left", "top-right", "bottom-left", "bottom-right"];
 const EDGE_MARGIN = 12;
-
-const MAX_HISTORY = 25;
+const MAX_HISTORY = 50;
+const MAX_QUEUE = 50;
+const MOVE_COOLDOWN_MS = 900;
+const MOVE_DURATION_MS = 960;
 
 const state = {
   currentTask: "",
+  queue: [],
   history: [],
   activeCorner: CORNERS[1],
   isEditorOpen: false,
   isHistoryOpen: false,
   isMoving: false,
   lastMoveAt: 0,
+  timerStartedAt: null,
+  timerAccumulatedMs: 0,
+  timerIsRunning: false,
+  timerIntervalId: null,
 };
 
 const storage = {
@@ -33,28 +42,33 @@ root.id = "task-bubble-root";
 document.documentElement.appendChild(root);
 
 root.innerHTML = `
-  <div class="task-bubble-shell ${state.activeCorner}">
+  <div class="task-bubble-shell" aria-live="polite">
     <div class="task-bubble-card">
-      <div class="task-bubble-header">
-        <div class="task-bubble-title">Current task</div>
-        <div class="task-bubble-actions">
-          <button class="task-bubble-button" data-action="edit">Edit</button>
-          <button class="task-bubble-button" data-action="history">History</button>
-        </div>
-      </div>
       <div class="task-bubble-body">
         <div class="task-bubble-task"></div>
-        <div class="task-bubble-tip">If your cursor bumps into it, it glides to another corner.</div>
+        <div class="task-bubble-timer-row">
+          <span class="task-bubble-timer"></span>
+          <span class="task-bubble-queue-count"></span>
+        </div>
       </div>
       <div class="task-bubble-panel task-bubble-editor-panel">
-        <textarea class="task-bubble-textarea" placeholder="Finish finding jobs"></textarea>
-        <div class="task-bubble-row">
-          <button class="task-bubble-button task-bubble-cancel" data-action="cancel">Cancel</button>
-          <button class="task-bubble-button task-bubble-save" data-action="save">Save</button>
+        <div class="task-bubble-panel-title">Current task</div>
+        <textarea class="task-bubble-textarea task-bubble-current-input" placeholder="Finish finding jobs"></textarea>
+        <div class="task-bubble-panel-title">Add next tasks to queue</div>
+        <textarea class="task-bubble-textarea task-bubble-queue-input" placeholder="One task per line"></textarea>
+        <div class="task-bubble-shortcuts">
+          Save: Ctrl/Cmd+Enter · History: Ctrl/Cmd+Shift+J · Done: Ctrl/Cmd+Shift+D · Pause timer: Ctrl/Cmd+Shift+P
         </div>
       </div>
       <div class="task-bubble-panel task-bubble-history-panel">
-        <div class="task-bubble-history-list"></div>
+        <div class="task-bubble-history-section">
+          <div class="task-bubble-panel-title">Up next</div>
+          <div class="task-bubble-queue-list"></div>
+        </div>
+        <div class="task-bubble-history-section">
+          <div class="task-bubble-panel-title">Completed</div>
+          <div class="task-bubble-history-list"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -62,36 +76,195 @@ root.innerHTML = `
 
 const shell = root.querySelector(".task-bubble-shell");
 const taskEl = root.querySelector(".task-bubble-task");
+const timerEl = root.querySelector(".task-bubble-timer");
+const queueCountEl = root.querySelector(".task-bubble-queue-count");
 const editorPanel = root.querySelector(".task-bubble-editor-panel");
 const historyPanel = root.querySelector(".task-bubble-history-panel");
-const textarea = root.querySelector(".task-bubble-textarea");
+const currentTaskInput = root.querySelector(".task-bubble-current-input");
+const queueInput = root.querySelector(".task-bubble-queue-input");
 const historyList = root.querySelector(".task-bubble-history-list");
+const queueList = root.querySelector(".task-bubble-queue-list");
 
-const saveHistoryEntry = async (taskText) => {
-  const trimmed = taskText.trim();
-  if (!trimmed) return;
+const nowIso = () => new Date().toISOString();
 
-  const nextHistory = [
-    {
-      text: trimmed,
-      savedAt: new Date().toISOString(),
+const formatDuration = (ms) => {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+};
+
+const getElapsedMs = () => {
+  if (!state.timerIsRunning || !state.timerStartedAt) {
+    return state.timerAccumulatedMs;
+  }
+
+  return state.timerAccumulatedMs + (Date.now() - state.timerStartedAt);
+};
+
+const persistTimer = async () => {
+  await storage.set({
+    [STORAGE_KEYS.timer]: {
+      startedAt: state.timerStartedAt,
+      accumulatedMs: state.timerAccumulatedMs,
+      isRunning: state.timerIsRunning,
     },
-    ...state.history.filter((entry) => entry.text !== trimmed),
-  ].slice(0, MAX_HISTORY);
+  });
+};
 
-  state.history = nextHistory;
-  await storage.set({ [STORAGE_KEYS.history]: nextHistory });
+const renderTimer = () => {
+  const prefix = state.timerIsRunning ? "Working" : "Paused";
+  timerEl.textContent = `${prefix} ${formatDuration(getElapsedMs())}`;
+};
+
+const startTicker = () => {
+  if (state.timerIntervalId) return;
+  state.timerIntervalId = window.setInterval(renderTimer, 1000);
+};
+
+const stopTicker = () => {
+  if (!state.timerIntervalId) return;
+  window.clearInterval(state.timerIntervalId);
+  state.timerIntervalId = null;
+};
+
+const startTimerForCurrentTask = async () => {
+  state.timerAccumulatedMs = 0;
+  state.timerStartedAt = Date.now();
+  state.timerIsRunning = Boolean(state.currentTask.trim());
+  renderTimer();
+  if (state.timerIsRunning) {
+    startTicker();
+  } else {
+    stopTicker();
+  }
+  await persistTimer();
+};
+
+const pauseResumeTimer = async () => {
+  if (!state.currentTask.trim()) return;
+
+  if (state.timerIsRunning && state.timerStartedAt) {
+    state.timerAccumulatedMs = getElapsedMs();
+    state.timerStartedAt = null;
+    state.timerIsRunning = false;
+    stopTicker();
+  } else {
+    state.timerStartedAt = Date.now();
+    state.timerIsRunning = true;
+    startTicker();
+  }
+
+  renderTimer();
+  await persistTimer();
 };
 
 const renderTask = () => {
   if (!state.currentTask.trim()) {
-    taskEl.textContent = "No task yet. Use Edit or the keyboard shortcut.";
+    taskEl.textContent = "No task set";
     taskEl.classList.add("task-bubble-empty");
+  } else {
+    taskEl.textContent = state.currentTask;
+    taskEl.classList.remove("task-bubble-empty");
+  }
+
+  queueCountEl.textContent = state.queue.length ? `${state.queue.length} queued` : "";
+};
+
+const saveHistoryEntry = async (entry) => {
+  const nextHistory = [entry, ...state.history].slice(0, MAX_HISTORY);
+  state.history = nextHistory;
+  await storage.set({ [STORAGE_KEYS.history]: nextHistory });
+};
+
+const persistQueue = async () => {
+  await storage.set({ [STORAGE_KEYS.queue]: state.queue.slice(0, MAX_QUEUE) });
+};
+
+const renderQueue = () => {
+  queueList.innerHTML = "";
+
+  if (!state.queue.length) {
+    const empty = document.createElement("div");
+    empty.className = "task-bubble-history-empty";
+    empty.textContent = "Nothing queued.";
+    queueList.appendChild(empty);
     return;
   }
 
-  taskEl.textContent = state.currentTask;
-  taskEl.classList.remove("task-bubble-empty");
+  state.queue.forEach((task, index) => {
+    const item = document.createElement("div");
+    item.className = "task-bubble-list-item";
+
+    const text = document.createElement("button");
+    text.type = "button";
+    text.className = "task-bubble-history-entry";
+    text.textContent = task;
+    text.addEventListener("click", async () => {
+      state.queue.splice(index, 1);
+      state.currentTask = task;
+      renderTask();
+      renderQueue();
+      await persistQueue();
+      await storage.set({ [STORAGE_KEYS.task]: state.currentTask });
+      await startTimerForCurrentTask();
+      closeHistory();
+    });
+
+    const actions = document.createElement("div");
+    actions.className = "task-bubble-list-actions";
+
+    const up = document.createElement("button");
+    up.type = "button";
+    up.className = "task-bubble-mini-button";
+    up.textContent = "↑";
+    up.disabled = index === 0;
+    up.addEventListener("click", async () => {
+      if (index === 0) return;
+      [state.queue[index - 1], state.queue[index]] = [state.queue[index], state.queue[index - 1]];
+      renderQueue();
+      await persistQueue();
+    });
+
+    const down = document.createElement("button");
+    down.type = "button";
+    down.className = "task-bubble-mini-button";
+    down.textContent = "↓";
+    down.disabled = index === state.queue.length - 1;
+    down.addEventListener("click", async () => {
+      if (index === state.queue.length - 1) return;
+      [state.queue[index + 1], state.queue[index]] = [state.queue[index], state.queue[index + 1]];
+      renderQueue();
+      await persistQueue();
+    });
+
+    const makeCurrent = document.createElement("button");
+    makeCurrent.type = "button";
+    makeCurrent.className = "task-bubble-mini-button";
+    makeCurrent.textContent = "Now";
+    makeCurrent.addEventListener("click", async () => {
+      state.queue.splice(index, 1);
+      if (state.currentTask.trim()) {
+        state.queue.unshift(state.currentTask);
+      }
+      state.currentTask = task;
+      renderTask();
+      renderQueue();
+      await persistQueue();
+      await storage.set({ [STORAGE_KEYS.task]: state.currentTask });
+      await startTimerForCurrentTask();
+    });
+
+    actions.append(up, down, makeCurrent);
+    item.append(text, actions);
+    queueList.appendChild(item);
+  });
 };
 
 const renderHistory = () => {
@@ -100,31 +273,27 @@ const renderHistory = () => {
   if (!state.history.length) {
     const empty = document.createElement("div");
     empty.className = "task-bubble-history-empty";
-    empty.textContent = "No saved tasks yet.";
+    empty.textContent = "Nothing completed yet.";
     historyList.appendChild(empty);
     return;
   }
 
   state.history.forEach((entry) => {
-    const row = document.createElement("div");
-    row.className = "task-bubble-history-item";
-
     const button = document.createElement("button");
-    button.className = "task-bubble-history-entry";
+    button.className = "task-bubble-history-entry task-bubble-history-entry-block";
     button.type = "button";
     button.innerHTML = `
       <div>${entry.text}</div>
-      <span class="task-bubble-history-meta">${new Date(entry.savedAt).toLocaleString()}</span>
+      <span class="task-bubble-history-meta">${formatDuration(entry.elapsedMs || 0)} · ${new Date(entry.savedAt).toLocaleString()}</span>
     `;
     button.addEventListener("click", async () => {
       state.currentTask = entry.text;
       renderTask();
-      closeHistory();
       await storage.set({ [STORAGE_KEYS.task]: state.currentTask });
+      await startTimerForCurrentTask();
+      closeHistory();
     });
-
-    row.appendChild(button);
-    historyList.appendChild(row);
+    historyList.appendChild(button);
   });
 };
 
@@ -170,18 +339,34 @@ const moveToRandomCorner = async () => {
   window.setTimeout(() => {
     state.isMoving = false;
     shell.classList.remove("is-gliding");
-  }, 960);
+  }, MOVE_DURATION_MS);
 };
 
-const openEditor = () => {
+const ensurePanelVisible = async () => {
+  const rect = shell.getBoundingClientRect();
+  const overflowBottom = rect.bottom - window.innerHeight;
+  const overflowTop = EDGE_MARGIN - rect.top;
+
+  if (overflowBottom > 0) {
+    shell.style.top = `${Math.max(EDGE_MARGIN, rect.top - overflowBottom - EDGE_MARGIN)}px`;
+    shell.style.left = `${rect.left}px`;
+  } else if (overflowTop > 0) {
+    shell.style.top = `${EDGE_MARGIN}px`;
+    shell.style.left = `${rect.left}px`;
+  }
+};
+
+const openEditor = async () => {
   state.isEditorOpen = true;
   state.isHistoryOpen = false;
   editorPanel.classList.add("open");
   historyPanel.classList.remove("open");
-  textarea.value = state.currentTask;
+  currentTaskInput.value = state.currentTask;
+  queueInput.value = "";
+  await ensurePanelVisible();
   requestAnimationFrame(() => {
-    textarea.focus();
-    textarea.select();
+    currentTaskInput.focus();
+    currentTaskInput.select();
   });
 };
 
@@ -190,12 +375,14 @@ const closeEditor = () => {
   editorPanel.classList.remove("open");
 };
 
-const openHistory = () => {
+const openHistory = async () => {
   state.isHistoryOpen = true;
   state.isEditorOpen = false;
   historyPanel.classList.add("open");
   editorPanel.classList.remove("open");
+  renderQueue();
   renderHistory();
+  await ensurePanelVisible();
 };
 
 const closeHistory = () => {
@@ -203,73 +390,102 @@ const closeHistory = () => {
   historyPanel.classList.remove("open");
 };
 
-const toggleHistory = () => {
+const toggleHistory = async () => {
   if (state.isHistoryOpen) {
     closeHistory();
     return;
   }
 
-  openHistory();
+  await openHistory();
 };
 
+const parseQueueInput = () =>
+  queueInput.value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
 const saveTask = async () => {
-  const nextTask = textarea.value.trim();
+  const nextTask = currentTaskInput.value.trim();
+  const nextQueuedTasks = parseQueueInput();
+  const taskChanged = nextTask !== state.currentTask;
+
   state.currentTask = nextTask;
+  if (nextQueuedTasks.length) {
+    state.queue = [...state.queue, ...nextQueuedTasks].slice(0, MAX_QUEUE);
+    await persistQueue();
+  }
+
   renderTask();
+  renderQueue();
   closeEditor();
   await storage.set({ [STORAGE_KEYS.task]: nextTask });
-  await saveHistoryEntry(nextTask);
+
+  if (taskChanged) {
+    await startTimerForCurrentTask();
+  }
+};
+
+const completeCurrentTask = async () => {
+  if (!state.currentTask.trim()) return;
+
+  await saveHistoryEntry({
+    text: state.currentTask,
+    savedAt: nowIso(),
+    elapsedMs: getElapsedMs(),
+  });
+
+  const nextTask = state.queue.shift() || "";
+  state.currentTask = nextTask;
+  renderTask();
+  renderQueue();
+  renderHistory();
+
+  await Promise.all([
+    storage.set({ [STORAGE_KEYS.task]: state.currentTask }),
+    persistQueue(),
+  ]);
+
+  await startTimerForCurrentTask();
 };
 
 const initialize = async () => {
-  const stored = await storage.get([STORAGE_KEYS.task, STORAGE_KEYS.history, STORAGE_KEYS.corner]);
+  const stored = await storage.get([
+    STORAGE_KEYS.task,
+    STORAGE_KEYS.queue,
+    STORAGE_KEYS.history,
+    STORAGE_KEYS.corner,
+    STORAGE_KEYS.timer,
+  ]);
+
   state.currentTask = stored[STORAGE_KEYS.task] || "";
+  state.queue = stored[STORAGE_KEYS.queue] || [];
   state.history = stored[STORAGE_KEYS.history] || [];
   state.activeCorner = stored[STORAGE_KEYS.corner] || CORNERS[1];
+
+  const timer = stored[STORAGE_KEYS.timer] || {};
+  state.timerStartedAt = timer.startedAt ? new Date(timer.startedAt).getTime() : null;
+  state.timerAccumulatedMs = timer.accumulatedMs || 0;
+  state.timerIsRunning = Boolean(timer.isRunning && state.currentTask.trim());
+
   await applyCorner(state.activeCorner);
   renderTask();
+  renderQueue();
   renderHistory();
+  renderTimer();
+
+  if (state.timerIsRunning) {
+    startTicker();
+  }
 };
 
 window.addEventListener("resize", () => {
   applyCorner(state.activeCorner);
 });
 
-root.addEventListener("click", async (event) => {
-  const button = event.target.closest("[data-action]");
-  if (button) {
-    const action = button.getAttribute("data-action");
-
-    if (action === "edit") {
-      openEditor();
-      return;
-    }
-
-    if (action === "history") {
-      toggleHistory();
-      return;
-    }
-
-    if (action === "cancel") {
-      closeEditor();
-      return;
-    }
-
-    if (action === "save") {
-      await saveTask();
-      return;
-    }
-  }
-});
-
 window.addEventListener("mousemove", async (event) => {
-  if (state.isEditorOpen || state.isHistoryOpen || state.isMoving) {
-    return;
-  }
-
-  if (Date.now() - state.lastMoveAt < 900) {
-    return;
-  }
+  if (state.isEditorOpen || state.isHistoryOpen || state.isMoving) return;
+  if (Date.now() - state.lastMoveAt < MOVE_COOLDOWN_MS) return;
 
   const rect = shell.getBoundingClientRect();
   const padding = 14;
@@ -281,16 +497,20 @@ window.addEventListener("mousemove", async (event) => {
   }
 });
 
-textarea.addEventListener("keydown", async (event) => {
+const handleEditorKeydown = async (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
     event.preventDefault();
     await saveTask();
+    return;
   }
 
   if (event.key === "Escape") {
     closeEditor();
   }
-});
+};
+
+currentTaskInput.addEventListener("keydown", handleEditorKeydown);
+queueInput.addEventListener("keydown", handleEditorKeydown);
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message?.type === "TASK_BUBBLE_OPEN_EDITOR") {
@@ -299,6 +519,14 @@ chrome.runtime.onMessage.addListener((message) => {
 
   if (message?.type === "TASK_BUBBLE_TOGGLE_HISTORY") {
     toggleHistory();
+  }
+
+  if (message?.type === "TASK_BUBBLE_COMPLETE_TASK") {
+    completeCurrentTask();
+  }
+
+  if (message?.type === "TASK_BUBBLE_TOGGLE_TIMER") {
+    pauseResumeTimer();
   }
 });
 

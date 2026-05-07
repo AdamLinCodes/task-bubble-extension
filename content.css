@@ -37,48 +37,12 @@
   overflow: hidden;
 }
 
-.task-bubble-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 10px 12px 8px;
-}
-
-.task-bubble-title {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--task-bubble-subtle);
-}
-
-.task-bubble-actions {
-  display: flex;
-  gap: 6px;
-}
-
-.task-bubble-button {
-  appearance: none;
-  border: 0;
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--task-bubble-text);
-  border-radius: 999px;
-  padding: 6px 9px;
-  font-size: 11px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.task-bubble-button:hover {
-  background: rgba(255, 255, 255, 0.18);
-}
-
 .task-bubble-body {
-  padding: 0 12px 12px;
+  padding: 12px;
 }
 
 .task-bubble-task {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.35;
   font-weight: 600;
   word-break: break-word;
@@ -89,7 +53,10 @@
   font-style: italic;
 }
 
-.task-bubble-tip {
+.task-bubble-timer-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
   margin-top: 8px;
   font-size: 11px;
   color: var(--task-bubble-subtle);
@@ -103,10 +70,20 @@
   padding: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   display: none;
+  max-height: min(60vh, 460px);
+  overflow: auto;
 }
 
 .task-bubble-panel.open {
   display: block;
+}
+
+.task-bubble-panel-title {
+  margin-bottom: 8px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--task-bubble-subtle);
 }
 
 .task-bubble-textarea {
@@ -122,52 +99,80 @@
   outline: none;
 }
 
+.task-bubble-textarea + .task-bubble-panel-title {
+  margin-top: 12px;
+}
+
 .task-bubble-textarea::placeholder {
   color: rgba(255, 255, 255, 0.58);
 }
 
-.task-bubble-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
+.task-bubble-shortcuts {
   margin-top: 10px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--task-bubble-subtle);
 }
 
-.task-bubble-save {
-  background: rgba(74, 222, 128, 0.28);
+.task-bubble-history-section + .task-bubble-history-section {
+  margin-top: 14px;
 }
 
-.task-bubble-cancel {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.task-bubble-history-list {
+.task-bubble-history-list,
+.task-bubble-queue-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 240px;
-  overflow: auto;
 }
 
-.task-bubble-history-item {
+.task-bubble-list-item {
   display: flex;
   gap: 8px;
-  align-items: flex-start;
+  align-items: stretch;
+}
+
+.task-bubble-list-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .task-bubble-history-entry {
   flex: 1;
-  background: rgba(255, 255, 255, 0.08);
+  appearance: none;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--task-bubble-text);
   padding: 10px;
   font-size: 13px;
-  color: var(--task-bubble-text);
+  text-align: left;
   cursor: pointer;
 }
 
-.task-bubble-history-entry:hover {
+.task-bubble-history-entry:hover,
+.task-bubble-mini-button:hover {
   background: rgba(255, 255, 255, 0.14);
+}
+
+.task-bubble-history-entry-block {
+  width: 100%;
+}
+
+.task-bubble-mini-button {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--task-bubble-text);
+  padding: 6px 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.task-bubble-mini-button:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .task-bubble-history-meta {

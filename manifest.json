@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Task Bubble",
   "description": "A translucent floating bubble that keeps your current task visible on any page.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "permissions": ["storage", "activeTab", "scripting"],
   "background": {
     "service_worker": "background.js"
@@ -20,10 +20,24 @@
     },
     "toggle-task-history": {
       "suggested_key": {
-        "default": "Ctrl+Shift+H",
-        "mac": "Command+Shift+H"
+        "default": "Ctrl+Shift+J",
+        "mac": "Command+Shift+J"
       },
-      "description": "Show or hide task history"
+      "description": "Show or hide task history and queue"
+    },
+    "complete-task-bubble": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+D",
+        "mac": "Command+Shift+D"
+      },
+      "description": "Mark the current task done and move to the next queued task"
+    },
+    "toggle-task-timer": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+P",
+        "mac": "Command+Shift+P"
+      },
+      "description": "Pause or resume the task timer"
     }
   },
   "content_scripts": [
