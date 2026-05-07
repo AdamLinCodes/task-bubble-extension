@@ -21,27 +21,10 @@
   width: 280px;
   max-width: calc(100vw - 24px);
   color: var(--task-bubble-text);
-  transition: top 520ms cubic-bezier(0.22, 1, 0.36, 1), right 520ms cubic-bezier(0.22, 1, 0.36, 1), bottom 520ms cubic-bezier(0.22, 1, 0.36, 1), left 520ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease, transform 220ms ease;
-}
-
-.task-bubble-shell.corner-top-left {
   top: 12px;
-  left: 12px;
-}
-
-.task-bubble-shell.corner-top-right {
-  top: 12px;
-  right: 12px;
-}
-
-.task-bubble-shell.corner-bottom-left {
-  bottom: 12px;
-  left: 12px;
-}
-
-.task-bubble-shell.corner-bottom-right {
-  bottom: 12px;
-  right: 12px;
+  left: calc(100vw - 292px);
+  transition: top 900ms cubic-bezier(0.22, 1, 0.36, 1), left 900ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease, transform 220ms ease;
+  will-change: top, left, transform;
 }
 
 .task-bubble-card {

@@ -4,12 +4,8 @@ const STORAGE_KEYS = {
   corner: "taskBubble.corner",
 };
 
-const CORNERS = [
-  "corner-top-left",
-  "corner-top-right",
-  "corner-bottom-left",
-  "corner-bottom-right",
-];
+const CORNERS = ["top-left", "top-right", "bottom-left", "bottom-right"];
+const EDGE_MARGIN = 12;
 
 const MAX_HISTORY = 25;
 
@@ -132,9 +128,30 @@ const renderHistory = () => {
   });
 };
 
+const getCornerPosition = (corner) => {
+  const rect = shell.getBoundingClientRect();
+  const bubbleWidth = rect.width || 280;
+  const bubbleHeight = rect.height || 120;
+  const maxLeft = Math.max(EDGE_MARGIN, window.innerWidth - bubbleWidth - EDGE_MARGIN);
+  const maxTop = Math.max(EDGE_MARGIN, window.innerHeight - bubbleHeight - EDGE_MARGIN);
+
+  switch (corner) {
+    case "top-left":
+      return { top: EDGE_MARGIN, left: EDGE_MARGIN };
+    case "top-right":
+      return { top: EDGE_MARGIN, left: maxLeft };
+    case "bottom-left":
+      return { top: maxTop, left: EDGE_MARGIN };
+    case "bottom-right":
+    default:
+      return { top: maxTop, left: maxLeft };
+  }
+};
+
 const applyCorner = async (corner) => {
-  shell.classList.remove(...CORNERS);
-  shell.classList.add(corner);
+  const position = getCornerPosition(corner);
+  shell.style.top = `${position.top}px`;
+  shell.style.left = `${position.left}px`;
   state.activeCorner = corner;
   await storage.set({ [STORAGE_KEYS.corner]: corner });
 };
@@ -153,7 +170,7 @@ const moveToRandomCorner = async () => {
   window.setTimeout(() => {
     state.isMoving = false;
     shell.classList.remove("is-gliding");
-  }, 560);
+  }, 960);
 };
 
 const openEditor = () => {
@@ -213,6 +230,10 @@ const initialize = async () => {
   renderTask();
   renderHistory();
 };
+
+window.addEventListener("resize", () => {
+  applyCorner(state.activeCorner);
+});
 
 root.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-action]");
