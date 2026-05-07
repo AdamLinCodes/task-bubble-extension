@@ -126,7 +126,7 @@ const renderTimer = () => {
 
   statusDotEl.classList.toggle("is-active", hasTask && state.timerIsRunning);
   statusDotEl.classList.toggle("is-paused", hasTask && !state.timerIsRunning);
-  statusDotEl.classList.toggle("is-hidden", !hasTask);
+  statusDotEl.classList.toggle("is-idle", !hasTask);
 };
 
 const startTicker = () => {
@@ -273,28 +273,7 @@ const renderQueue = () => {
       closeHistory();
     });
 
-    const actions = document.createElement("div");
-    actions.className = "task-bubble-list-actions";
-
-    const makeCurrent = document.createElement("button");
-    makeCurrent.type = "button";
-    makeCurrent.className = "task-bubble-mini-button";
-    makeCurrent.textContent = "Now";
-    makeCurrent.addEventListener("click", async () => {
-      state.queue.splice(index, 1);
-      if (state.currentTask.trim()) {
-        state.queue.unshift(state.currentTask);
-      }
-      state.currentTask = task;
-      renderTask();
-      renderQueue();
-      await persistQueue();
-      await storage.set({ [STORAGE_KEYS.task]: state.currentTask });
-      await startTimerForCurrentTask();
-    });
-
-    actions.append(makeCurrent);
-    item.append(dragHandle, text, actions);
+    item.append(dragHandle, text);
     queueList.appendChild(item);
   });
 };
