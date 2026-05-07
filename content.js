@@ -298,17 +298,18 @@ const renderHistory = () => {
       <span class="task-bubble-history-meta">${formatDuration(entry.elapsedMs || 0)} · ${new Date(entry.savedAt).toLocaleString()}</span>
     `;
 
-    const clearButton = document.createElement("button");
-    clearButton.type = "button";
-    clearButton.className = "task-bubble-mini-button";
-    clearButton.textContent = "Clear";
-    clearButton.addEventListener("click", async () => {
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "task-bubble-mini-button";
+    deleteButton.textContent = "×";
+    deleteButton.setAttribute("aria-label", "Delete completed task");
+    deleteButton.addEventListener("click", async () => {
       state.history.splice(index, 1);
       renderHistory();
       await storage.set({ [STORAGE_KEYS.history]: state.history });
     });
 
-    item.append(content, clearButton);
+    item.append(content, deleteButton);
     historyList.appendChild(item);
   });
 };
