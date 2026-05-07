@@ -45,7 +45,10 @@ root.innerHTML = `
   <div class="task-bubble-shell" aria-live="polite">
     <div class="task-bubble-card">
       <div class="task-bubble-body">
-        <div class="task-bubble-task"></div>
+        <div class="task-bubble-task-row">
+          <span class="task-bubble-status-dot"></span>
+          <div class="task-bubble-task"></div>
+        </div>
         <div class="task-bubble-timer-row">
           <span class="task-bubble-timer"></span>
           <span class="task-bubble-queue-count"></span>
@@ -76,6 +79,7 @@ root.innerHTML = `
 
 const shell = root.querySelector(".task-bubble-shell");
 const taskEl = root.querySelector(".task-bubble-task");
+const statusDotEl = root.querySelector(".task-bubble-status-dot");
 const timerEl = root.querySelector(".task-bubble-timer");
 const queueCountEl = root.querySelector(".task-bubble-queue-count");
 const editorPanel = root.querySelector(".task-bubble-editor-panel");
@@ -119,8 +123,13 @@ const persistTimer = async () => {
 };
 
 const renderTimer = () => {
+  const hasTask = Boolean(state.currentTask.trim());
   const prefix = state.timerIsRunning ? "Working" : "Paused";
   timerEl.textContent = `${prefix} ${formatDuration(getElapsedMs())}`;
+
+  statusDotEl.classList.toggle("is-active", hasTask && state.timerIsRunning);
+  statusDotEl.classList.toggle("is-paused", hasTask && !state.timerIsRunning);
+  statusDotEl.classList.toggle("is-hidden", !hasTask);
 };
 
 const startTicker = () => {
