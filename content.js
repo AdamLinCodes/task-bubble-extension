@@ -55,12 +55,10 @@ root.innerHTML = `
         </div>
       </div>
       <div class="task-bubble-panel task-bubble-editor-panel">
-        <div class="task-bubble-panel-title">Current task</div>
-        <textarea class="task-bubble-textarea task-bubble-current-input" placeholder="Finish finding jobs"></textarea>
-        <div class="task-bubble-panel-title">Add next tasks to queue</div>
+        <div class="task-bubble-panel-title">Add tasks</div>
         <textarea class="task-bubble-textarea task-bubble-queue-input" placeholder="One task per line"></textarea>
         <div class="task-bubble-shortcuts">
-          Save: Ctrl/Cmd+Enter · History: Ctrl/Cmd+Shift+J · Done: Ctrl/Cmd+Shift+D · Pause timer: Ctrl/Cmd+Shift+P
+          Add: Ctrl/Cmd+Enter · History: Ctrl/Cmd+Shift+J · Done: Ctrl/Cmd+Shift+D · Pause timer: Ctrl/Cmd+Shift+P
         </div>
       </div>
       <div class="task-bubble-panel task-bubble-history-panel">
@@ -84,7 +82,6 @@ const timerEl = root.querySelector(".task-bubble-timer");
 const queueCountEl = root.querySelector(".task-bubble-queue-count");
 const editorPanel = root.querySelector(".task-bubble-editor-panel");
 const historyPanel = root.querySelector(".task-bubble-history-panel");
-const currentTaskInput = root.querySelector(".task-bubble-current-input");
 const queueInput = root.querySelector(".task-bubble-queue-input");
 const historyList = root.querySelector(".task-bubble-history-list");
 const queueList = root.querySelector(".task-bubble-queue-list");
@@ -210,6 +207,53 @@ const renderQueue = () => {
   state.queue.forEach((task, index) => {
     const item = document.createElement("div");
     item.className = "task-bubble-list-item";
+    item.draggable = true;
+    item.dataset.index = String(index);
+
+    item.addEventListener("dragstart", (event) => {
+      item.classList.add("is-dragging");
+      event.dataTransfer?.setData("text/plain", String(index));
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = "move";
+      }
+    });
+
+    item.addEventListener("dragend", () => {
+      item.classList.remove("is-dragging");
+      queueList.querySelectorAll(".is-drop-target").forEach((el) => el.classList.remove("is-drop-target"));
+    });
+
+    item.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "move";
+      }
+      item.classList.add("is-drop-target");
+    });
+
+    item.addEventListener("dragleave", () => {
+      item.classList.remove("is-drop-target");
+    });
+
+    item.addEventListener("drop", async (event) => {
+      event.preventDefault();
+      item.classList.remove("is-drop-target");
+      const fromIndex = Number(event.dataTransfer?.getData("text/plain"));
+      const toIndex = index;
+      if (Number.isNaN(fromIndex) || fromIndex === toIndex || fromIndex < 0 || fromIndex >= state.queue.length) {
+        return;
+      }
+      const [movedTask] = state.queue.splice(fromIndex, 1);
+      state.queue.splice(toIndex, 0, movedTask);
+      renderQueue();
+      await persistQueue();
+    });
+
+    const dragHandle = document.createElement("div");
+    dragHandle.className = "task-bubble-drag-handle";
+    dragHandle.textContent = "☰";
+    dragHandle.setAttribute("aria-label", "Drag to reorder task");
+    dragHandle.title = "Drag to reorder";
 
     const text = document.createElement("button");
     text.type = "button";
@@ -217,6 +261,9 @@ const renderQueue = () => {
     text.textContent = task;
     text.addEventListener("click", async () => {
       state.queue.splice(index, 1);
+      if (state.currentTask.trim()) {
+        state.queue.unshift(state.currentTask);
+      }
       state.currentTask = task;
       renderTask();
       renderQueue();
@@ -228,30 +275,6 @@ const renderQueue = () => {
 
     const actions = document.createElement("div");
     actions.className = "task-bubble-list-actions";
-
-    const up = document.createElement("button");
-    up.type = "button";
-    up.className = "task-bubble-mini-button";
-    up.textContent = "↑";
-    up.disabled = index === 0;
-    up.addEventListener("click", async () => {
-      if (index === 0) return;
-      [state.queue[index - 1], state.queue[index]] = [state.queue[index], state.queue[index - 1]];
-      renderQueue();
-      await persistQueue();
-    });
-
-    const down = document.createElement("button");
-    down.type = "button";
-    down.className = "task-bubble-mini-button";
-    down.textContent = "↓";
-    down.disabled = index === state.queue.length - 1;
-    down.addEventListener("click", async () => {
-      if (index === state.queue.length - 1) return;
-      [state.queue[index + 1], state.queue[index]] = [state.queue[index], state.queue[index + 1]];
-      renderQueue();
-      await persistQueue();
-    });
 
     const makeCurrent = document.createElement("button");
     makeCurrent.type = "button";
@@ -270,8 +293,8 @@ const renderQueue = () => {
       await startTimerForCurrentTask();
     });
 
-    actions.append(up, down, makeCurrent);
-    item.append(text, actions);
+    actions.append(makeCurrent);
+    item.append(dragHandle, text, actions);
     queueList.appendChild(item);
   });
 };
@@ -294,7 +317,7 @@ const renderHistory = () => {
     const content = document.createElement("div");
     content.className = "task-bubble-history-entry task-bubble-history-entry-block task-bubble-history-static";
     content.innerHTML = `
-      <div>${entry.text}</div>
+      <div class="task-bubble-completed-title">${entry.text}</div>
       <span class="task-bubble-history-meta">${formatDuration(entry.elapsedMs || 0)} · ${new Date(entry.savedAt).toLocaleString()}</span>
     `;
 
@@ -378,12 +401,11 @@ const openEditor = async () => {
   state.isHistoryOpen = false;
   editorPanel.classList.add("open");
   historyPanel.classList.remove("open");
-  currentTaskInput.value = state.currentTask;
   queueInput.value = "";
   await ensurePanelVisible();
   requestAnimationFrame(() => {
-    currentTaskInput.focus();
-    currentTaskInput.select();
+    queueInput.focus();
+    queueInput.select();
   });
 };
 
@@ -423,12 +445,21 @@ const parseQueueInput = () =>
     .filter(Boolean);
 
 const saveTask = async () => {
-  const nextTask = currentTaskInput.value.trim();
   const nextQueuedTasks = parseQueueInput();
-  const taskChanged = nextTask !== state.currentTask;
 
-  state.currentTask = nextTask;
-  if (nextQueuedTasks.length) {
+  if (!nextQueuedTasks.length) {
+    closeEditor();
+    return;
+  }
+
+  if (!state.currentTask.trim()) {
+    const [firstTask, ...remainingTasks] = nextQueuedTasks;
+    state.currentTask = firstTask;
+    state.queue = [...remainingTasks, ...state.queue].slice(0, MAX_QUEUE);
+    await storage.set({ [STORAGE_KEYS.task]: state.currentTask });
+    await persistQueue();
+    await startTimerForCurrentTask();
+  } else {
     state.queue = [...state.queue, ...nextQueuedTasks].slice(0, MAX_QUEUE);
     await persistQueue();
   }
@@ -436,11 +467,6 @@ const saveTask = async () => {
   renderTask();
   renderQueue();
   closeEditor();
-  await storage.set({ [STORAGE_KEYS.task]: nextTask });
-
-  if (taskChanged) {
-    await startTimerForCurrentTask();
-  }
 };
 
 const completeCurrentTask = async () => {
@@ -514,7 +540,7 @@ window.addEventListener("mousemove", async (event) => {
   }
 });
 
-const handleEditorKeydown = async (event) => {
+queueInput.addEventListener("keydown", async (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
     event.preventDefault();
     await saveTask();
@@ -524,10 +550,7 @@ const handleEditorKeydown = async (event) => {
   if (event.key === "Escape") {
     closeEditor();
   }
-};
-
-currentTaskInput.addEventListener("keydown", handleEditorKeydown);
-queueInput.addEventListener("keydown", handleEditorKeydown);
+});
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message?.type === "TASK_BUBBLE_OPEN_EDITOR") {

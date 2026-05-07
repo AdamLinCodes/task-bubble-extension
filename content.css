@@ -130,10 +130,6 @@
   outline: none;
 }
 
-.task-bubble-textarea + .task-bubble-panel-title {
-  margin-top: 12px;
-}
-
 .task-bubble-textarea::placeholder {
   color: rgba(255, 255, 255, 0.58);
 }
@@ -162,10 +158,32 @@
   align-items: stretch;
 }
 
+.task-bubble-list-item.is-dragging {
+  opacity: 0.45;
+}
+
+.task-bubble-list-item.is-drop-target .task-bubble-history-entry,
+.task-bubble-list-item.is-drop-target .task-bubble-drag-handle {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 .task-bubble-list-actions {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.task-bubble-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--task-bubble-subtle);
+  cursor: grab;
+  user-select: none;
 }
 
 .task-bubble-history-entry {
@@ -212,6 +230,12 @@
 .task-bubble-mini-button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+.task-bubble-completed-title {
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(255, 255, 255, 0.6);
 }
 
 .task-bubble-history-meta {
