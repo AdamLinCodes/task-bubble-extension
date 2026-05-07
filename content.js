@@ -57,9 +57,6 @@ root.innerHTML = `
       <div class="task-bubble-panel task-bubble-editor-panel">
         <div class="task-bubble-panel-title">Add tasks</div>
         <textarea class="task-bubble-textarea task-bubble-queue-input" placeholder="One task per line"></textarea>
-        <div class="task-bubble-shortcuts">
-          Add: Ctrl/Cmd+Enter · History: Ctrl/Cmd+Shift+J · Done: Ctrl/Cmd+Shift+D · Pause timer: Ctrl/Cmd+Shift+P
-        </div>
       </div>
       <div class="task-bubble-panel task-bubble-history-panel">
         <div class="task-bubble-history-section">
