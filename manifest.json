@@ -16,14 +16,21 @@
         "default": "Ctrl+Shift+Y",
         "mac": "MacCtrl+Shift+Y"
       },
-      "description": "Edit the current task bubble text"
+      "description": "Add tasks to the task bubble"
+    },
+    "toggle-task-queue": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Q",
+        "mac": "MacCtrl+Shift+Q"
+      },
+      "description": "Show or hide the task queue"
     },
     "toggle-task-history": {
       "suggested_key": {
-        "default": "Ctrl+Shift+J",
-        "mac": "MacCtrl+Shift+J"
+        "default": "Ctrl+Shift+H",
+        "mac": "MacCtrl+Shift+H"
       },
-      "description": "Show or hide task history and queue"
+      "description": "Show or hide completed task history"
     },
     "complete-task-bubble": {
       "suggested_key": {

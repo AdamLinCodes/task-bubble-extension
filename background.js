@@ -14,6 +14,10 @@ chrome.commands.onCommand.addListener(async (command) => {
     await broadcastToActiveTab({ type: "TASK_BUBBLE_OPEN_EDITOR" });
   }
 
+  if (command === "toggle-task-queue") {
+    await broadcastToActiveTab({ type: "TASK_BUBBLE_TOGGLE_QUEUE" });
+  }
+
   if (command === "toggle-task-history") {
     await broadcastToActiveTab({ type: "TASK_BUBBLE_TOGGLE_HISTORY" });
   }
