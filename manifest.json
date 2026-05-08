@@ -25,13 +25,6 @@
       },
       "description": "Show or hide the task queue"
     },
-    "toggle-task-history": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+H",
-        "mac": "MacCtrl+Shift+H"
-      },
-      "description": "Show or hide completed task history"
-    },
     "complete-task-bubble": {
       "suggested_key": {
         "default": "Ctrl+Shift+D",
