@@ -7,7 +7,7 @@ I kept getting distracted and forgetting what I was doing so I vibe coded this C
 - Minimal floating task bubble on all pages
 - Bubble glides away when your cursor bumps into it
 - One add-tasks field, with one task per line
-- Queue panel with a subtle completed-tasks dropdown
+- Separate queue and completed history panels
 - Done shortcut that advances to the next queued task
 - Draggable queue reordering with a handle
 - Built-in timer with pause/resume support
@@ -18,6 +18,7 @@ I kept getting distracted and forgetting what I was doing so I vibe coded this C
 
 - Add tasks: `Ctrl+Shift+Y` (`Control+Shift+Y` on macOS)
 - Toggle queue: `Ctrl+Shift+Q` (`Control+Shift+Q` on macOS)
+- Toggle history: `Ctrl+Shift+H` (`Control+Shift+H` on macOS)
 - Mark current task done: `Ctrl+Shift+D` (`Control+Shift+D` on macOS)
 - Pause or resume timer: `Ctrl+Shift+P` (`Control+Shift+P` on macOS)
 
@@ -39,5 +40,5 @@ You can change all shortcuts in Chrome at:
 - Additional tasks go into the queue
 - Use the queue shortcut to open the queued tasks panel
 - Drag queued tasks with the handle to reorder them
-- Use the subtle Completed dropdown inside queue to see finished tasks
+- Use the history shortcut to open completed task history
 - Use the done shortcut to mark the current task complete and pull in the next queued task

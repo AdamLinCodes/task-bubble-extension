@@ -115,6 +115,7 @@
   overflow: auto;
 }
 
+.task-bubble-history-panel,
 .task-bubble-queue-panel {
   max-height: min(58vh, 420px);
   overflow: auto;
@@ -130,8 +131,7 @@
   padding-right: 2px;
 }
 
-.task-bubble-panel.open,
-.task-bubble-completions-panel.open {
+.task-bubble-panel.open {
   display: block;
 }
 
@@ -165,31 +165,6 @@
   font-size: 11px;
   line-height: 1.4;
   color: var(--task-bubble-subtle);
-}
-
-.task-bubble-completions-toggle {
-  appearance: none;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 10px;
-  padding: 8px 2px 0;
-  border: 0;
-  background: transparent;
-  color: var(--task-bubble-subtle);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-}
-
-.task-bubble-completions-caret {
-  opacity: 0.8;
-}
-
-.task-bubble-completions-panel {
-  display: none;
-  margin-top: 8px;
 }
 
 .task-bubble-list-item {
@@ -238,9 +213,8 @@
 }
 
 .task-bubble-history-entry:hover,
-.task-bubble-mini-button:hover,
-.task-bubble-completions-toggle:hover {
-  background: rgba(255, 255, 255, 0.08);
+.task-bubble-mini-button:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .task-bubble-history-static:hover {
