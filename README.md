@@ -1,17 +1,6 @@
 # Task Bubble Chrome Extension
 
-A small Chrome extension that keeps your current task visible in a translucent floating bubble on every page.
-
-## Features
-
-- Minimal floating task bubble on all pages
-- Bubble glides away when your cursor bumps into it
-- One add-tasks field, with one task per line
-- Done shortcut that advances to the next queued task
-- Draggable queue reordering with a handle
-- Built-in timer with pause/resume support
-- Hidden queue and completed-task history panel
-- Local persistence using extension storage
+I kept getting distracted and forgetting what I was doing so I vibe coded this chrome extension to help remind you of queue of tasks at hand. Ironically, I was made this while should have been doing something else :(
 
 ## Default shortcuts
 
@@ -24,7 +13,9 @@ You can change all shortcuts in Chrome at:
 
 `chrome://extensions/shortcuts`
 
-## Install locally
+...WHICH I SUGGEST YOU DO. These aren't obvious shortcuts, but now I am used to them so I left them as default mwa haha :smiling_imp:
+
+## Setup and use right away
 
 1. Open `chrome://extensions`
 2. Enable **Developer mode**
