@@ -10,7 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
   func applicationDidFinishLaunching(_ notification: Notification) {
     NSApp.setActivationPolicy(.accessory)
 
-    let model = AppModel()
+    let model = AppModel(quitHandler: { NSApp.terminate(nil) })
     let notificationScheduler = FocusNotificationScheduler()
     let windowController = BubbleWindowController(model: model)
 
@@ -43,7 +43,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
   @objc private func startFocus() {
     model?.showFocus(startIfNeeded: true)
-    model?.isPinned = false
     windowController?.show()
   }
 
@@ -65,7 +64,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   @objc private func quit() {
-    NSApp.terminate(nil)
+    model?.quit()
   }
 
   private func installStatusItem() {

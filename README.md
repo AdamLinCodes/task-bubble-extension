@@ -34,6 +34,8 @@ The build script creates a universal, ad-hoc signed local app for Apple silicon 
 - Hold `Option` while approaching it to suppress the dodge.
 - While holding `Option`, click the pin button to leave it in place for editing or timer controls.
 - Use the pin button or menu-bar item to let it roam again.
+- Pinning persists when you flip between the whiteboard and focus timer.
+- Click the `x` button on either side to quit Task Bubble completely.
 - Click the timer button on the whiteboard to flip into the apple and start 30 minutes.
 - Crossed-out lines stay on the board and can be restored by clicking the checkmark.
 - Right-click a line to delete it permanently.

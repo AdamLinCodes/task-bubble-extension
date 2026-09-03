@@ -26,6 +26,13 @@ struct BoardView: View {
           Image(systemName: model.isPinned ? "pin.fill" : "pin")
         }
         .help(model.isPinned ? "Let the bubble dodge again" : "Pin the bubble")
+
+        Button {
+          model.quit()
+        } label: {
+          Image(systemName: "xmark")
+        }
+        .help("Quit Task Bubble")
       }
       .buttonStyle(.plain)
 
