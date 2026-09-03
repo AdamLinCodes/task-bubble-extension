@@ -8,6 +8,7 @@ final class PointerAvoidanceController: NSObject {
   private var ticker: Timer?
   private var isMoving = false
   private var lastMoveAt: Date?
+  private var catchState = PointerCatchState()
 
   init(panel: NSPanel, model: AppModel, engine: AvoidanceEngine = AvoidanceEngine()) {
     self.panel = panel
@@ -26,7 +27,17 @@ final class PointerAvoidanceController: NSObject {
 
   @objc private func checkPointer() {
     guard let panel, panel.isVisible else { return }
-    let optionIsHeld = NSEvent.modifierFlags.contains(.option)
+    let pointer = NSEvent.mouseLocation
+    let controlIsHeld = NSEvent.modifierFlags.contains(.control)
+    let catchArea = panel.frame.insetBy(
+      dx: -engine.triggerPadding,
+      dy: -engine.triggerPadding
+    )
+    let catchSuppressesAvoidance = catchState.suppressesAvoidance(
+      pointer: pointer,
+      catchArea: catchArea,
+      controlIsHeld: controlIsHeld
+    )
     guard
       let visibleFrame = panel.screen?.visibleFrame
         ?? screenContaining(panel.frame.center)?.visibleFrame
@@ -36,10 +47,10 @@ final class PointerAvoidanceController: NSObject {
 
     guard
       let destination = engine.destination(
-        pointer: NSEvent.mouseLocation,
+        pointer: pointer,
         panelFrame: panel.frame,
         visibleFrame: visibleFrame,
-        isPinned: model.isPinned || optionIsHeld,
+        isPinned: model.isPinned || catchSuppressesAvoidance,
         isMoving: isMoving,
         lastMoveAt: lastMoveAt,
         now: Date()
@@ -69,6 +80,27 @@ final class PointerAvoidanceController: NSObject {
 
   private func screenContaining(_ point: CGPoint) -> NSScreen? {
     NSScreen.screens.first { $0.frame.contains(point) }
+  }
+}
+
+struct PointerCatchState {
+  private var isCaught = false
+
+  mutating func suppressesAvoidance(
+    pointer: CGPoint,
+    catchArea: CGRect,
+    controlIsHeld: Bool
+  ) -> Bool {
+    if controlIsHeld {
+      isCaught = isCaught || catchArea.contains(pointer)
+      return true
+    }
+
+    if isCaught, !catchArea.contains(pointer) {
+      isCaught = false
+    }
+
+    return isCaught
   }
 }
 

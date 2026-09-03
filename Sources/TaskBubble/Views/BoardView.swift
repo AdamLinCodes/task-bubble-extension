@@ -59,7 +59,7 @@ struct BoardView: View {
       .background(Color.black.opacity(0.045), in: RoundedRectangle(cornerRadius: 12))
 
       HStack {
-        Text("Hold ⌥, then pin to edit")
+        Text("Hold ⌃, release, then pin")
         Spacer()
         Text("Return adds a line")
       }

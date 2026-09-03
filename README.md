@@ -9,7 +9,7 @@ Flip the whiteboard into an apple to start a focused 30-minute session. The boar
 - Always-on-top, borderless floating panel
 - Visible across desktop Spaces and alongside full-screen apps
 - Systemwide pointer avoidance with the original four-corner glide
-- Hold `Option` to catch the bubble, then use its pin button when you want to interact
+- Hold `Control` to catch the bubble, release it, then use the pin button when you want to interact
 - Ordered whiteboard lines that remain in place when crossed out
 - 30-minute apple focus timer with pause, resume, reset, progress, sound, and notification
 - Timer deadlines persist through sleep and relaunch
@@ -31,8 +31,8 @@ The build script creates a universal, ad-hoc signed local app for Apple silicon 
 ### Interaction
 
 - Approach the unpinned whiteboard or apple and it glides to another corner.
-- Hold `Option` while approaching it to suppress the dodge.
-- While holding `Option`, click the pin button to leave it in place for editing or timer controls.
+- Hold `Control` while approaching it to suppress the dodge.
+- Release `Control` once the pointer is over the bubble, then click the pin button to leave it in place for editing or timer controls.
 - Use the pin button or menu-bar item to let it roam again.
 - Click the timer button on the whiteboard to flip into the apple and start 30 minutes.
 - Crossed-out lines stay on the board and can be restored by clicking the checkmark.
