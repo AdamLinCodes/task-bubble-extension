@@ -1,0 +1,27 @@
+name: Verify macOS app
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  universal-app:
+    runs-on: macos-15
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: swift test
+
+      - name: Build universal app
+        run: ./scripts/build-app.sh
+
+      - name: Verify portability
+        run: ./scripts/verify-app.sh "dist/Task Bubble.app" local
