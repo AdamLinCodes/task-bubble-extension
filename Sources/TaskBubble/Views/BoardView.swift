@@ -93,7 +93,6 @@ struct BoardView: View {
       RoundedRectangle(cornerRadius: 22, style: .continuous)
         .stroke(Color.black.opacity(0.12), lineWidth: 1)
     }
-    .shadow(color: .black.opacity(0.22), radius: 22, y: 10)
     .alert("Clear the whiteboard?", isPresented: $isShowingClearConfirmation) {
       Button("Cancel", role: .cancel) {}
       Button("Clear All Lines", role: .destructive) {
