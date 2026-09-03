@@ -26,6 +26,13 @@ struct BoardView: View {
           Image(systemName: model.isPinned ? "pin.fill" : "pin")
         }
         .help(model.isPinned ? "Let the bubble dodge again" : "Pin the bubble")
+
+        Button {
+          model.quit()
+        } label: {
+          Image(systemName: "xmark")
+        }
+        .help("Quit Task Bubble")
       }
       .buttonStyle(.plain)
 
@@ -58,13 +65,10 @@ struct BoardView: View {
       .padding(10)
       .background(Color.black.opacity(0.045), in: RoundedRectangle(cornerRadius: 12))
 
-      HStack {
-        Text("Hold ⌥, then pin to edit")
-        Spacer()
-        Text("Return adds a line")
-      }
-      .font(.system(size: 10, weight: .medium))
-      .foregroundStyle(.secondary)
+      Text("Hold ⌥, then pin to edit")
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .font(.system(size: 10, weight: .medium))
+        .foregroundStyle(.secondary)
     }
     .padding(16)
     .frame(width: 330, height: 250)

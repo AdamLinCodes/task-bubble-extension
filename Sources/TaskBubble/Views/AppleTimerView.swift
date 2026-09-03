@@ -86,6 +86,19 @@ struct AppleTimerView: View {
       }
       .buttonStyle(.plain)
       .offset(x: 65, y: -58)
+
+      Button {
+        model.quit()
+      } label: {
+        Image(systemName: "xmark")
+          .font(.system(size: 11, weight: .bold))
+          .foregroundStyle(.white.opacity(0.9))
+          .padding(8)
+          .background(.black.opacity(0.14), in: Circle())
+      }
+      .buttonStyle(.plain)
+      .help("Quit Task Bubble")
+      .offset(x: -65, y: -58)
     }
     .frame(width: 210, height: 210)
   }

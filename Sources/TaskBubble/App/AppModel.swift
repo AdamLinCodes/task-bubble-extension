@@ -13,13 +13,16 @@ final class AppModel: ObservableObject {
 
   let board: BoardStore
   let focus: FocusTimerStore
+  private let quitHandler: () -> Void
 
   init(
     board: BoardStore = BoardStore(),
-    focus: FocusTimerStore = FocusTimerStore()
+    focus: FocusTimerStore = FocusTimerStore(),
+    quitHandler: @escaping () -> Void = {}
   ) {
     self.board = board
     self.focus = focus
+    self.quitHandler = quitHandler
   }
 
   func showBoard(pin: Bool = true) {
@@ -37,9 +40,12 @@ final class AppModel: ObservableObject {
   func flip() {
     if surface == .board {
       showFocus(startIfNeeded: true)
-      isPinned = false
     } else {
-      showBoard(pin: false)
+      surface = .board
     }
+  }
+
+  func quit() {
+    quitHandler()
   }
 }
