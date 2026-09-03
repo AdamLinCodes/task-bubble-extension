@@ -18,13 +18,19 @@ Flip the whiteboard into an apple to start a focused 30-minute session. The boar
 
 ### Build and run
 
-Task Bubble requires macOS 14 or newer and Xcode command-line tools.
+Task Bubble requires macOS 14 or newer and Xcode 16 or Apple's free Xcode
+Command Line Tools for Xcode 16. Full Xcode is not required.
 
 ```bash
 swift test
 ./scripts/build-app.sh
 open "dist/Task Bubble.app"
 ```
+
+If the repository is already cloned, do not clone it again. Enter the existing
+folder and update it with `git pull --ff-only` before building. The build script
+compiles Apple silicon and Intel separately so standalone Command Line Tools do
+not need the optional XCBuild component.
 
 The build script creates a universal, ad-hoc signed local app for Apple silicon and Intel Macs. A Developer ID signature and notarization are needed before distributing it to other Macs without Gatekeeper warnings.
 
