@@ -33,6 +33,7 @@ final class BubbleWindowController {
     panel.isReleasedWhenClosed = false
     panel.animationBehavior = .utilityWindow
     panel.contentViewController = NSHostingController(rootView: BubbleRootView(model: model))
+    panel.setFrame(initialFrame, display: false)
 
     avoidanceController = PointerAvoidanceController(panel: panel, model: model)
     surfaceCancellable = model.$surface

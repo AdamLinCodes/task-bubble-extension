@@ -8,7 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
   private var notificationScheduler: FocusNotificationScheduler?
 
   func applicationDidFinishLaunching(_ notification: Notification) {
-    NSApp.setActivationPolicy(.accessory)
+    NSApp.setActivationPolicy(.regular)
 
     let model = AppModel()
     let notificationScheduler = FocusNotificationScheduler()
@@ -34,6 +34,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
   func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
     false
+  }
+
+  func applicationShouldHandleReopen(
+    _ sender: NSApplication,
+    hasVisibleWindows flag: Bool
+  ) -> Bool {
+    windowController?.show()
+    return true
   }
 
   @objc private func showWhiteboard() {

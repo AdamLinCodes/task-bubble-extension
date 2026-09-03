@@ -13,7 +13,7 @@ Flip the whiteboard into an apple to start a focused 30-minute session. The boar
 - Ordered whiteboard lines that remain in place when crossed out
 - 30-minute apple focus timer with pause, resume, reset, progress, sound, and notification
 - Timer deadlines persist through sleep and relaunch
-- Menu-bar controls and no Dock icon
+- Apple icon in both the Dock and Applications, plus menu-bar controls
 - Respects Reduce Motion
 
 ### Build and run
