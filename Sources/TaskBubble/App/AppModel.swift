@@ -45,6 +45,11 @@ final class AppModel: ObservableObject {
     }
   }
 
+  func presentCompletedFocus() {
+    surface = .focus
+    isPinned = true
+  }
+
   func quit() {
     quitHandler()
   }

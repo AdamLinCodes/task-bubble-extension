@@ -11,7 +11,7 @@ Flip the whiteboard into an apple to start a focused 30-minute session. The boar
 - Directional pointer avoidance that can cross connected displays
 - Hold `Option` to catch the bubble, then use its pin button when you want to interact
 - Ordered whiteboard lines that remain in place when crossed out
-- 30-minute apple focus timer with pause, resume, reset, progress, sound, and notification
+- 30-minute apple focus timer with pause, resume, reset, progress, completion ding and shake, and notification
 - Timer deadlines persist through sleep and relaunch
 - Menu-bar controls and no Dock icon
 - Respects Reduce Motion
