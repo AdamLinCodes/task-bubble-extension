@@ -31,4 +31,16 @@ final class BoardStoreTests: XCTestCase {
     board.delete(id: item.id)
     XCTAssertTrue(board.items.isEmpty)
   }
+
+  func testClearDeletesEveryLineAndPersistsTheEmptyBoard() {
+    let storage = TestDataStore()
+    let board = BoardStore(storage: storage)
+    board.add("First line")
+    board.add("Second line")
+
+    board.clear()
+
+    XCTAssertTrue(board.items.isEmpty)
+    XCTAssertTrue(BoardStore(storage: storage).items.isEmpty)
+  }
 }

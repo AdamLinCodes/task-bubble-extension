@@ -4,6 +4,7 @@ struct BoardView: View {
   @ObservedObject var model: AppModel
   @ObservedObject var board: BoardStore
   @State private var draft = ""
+  @State private var isShowingClearConfirmation = false
 
   var body: some View {
     VStack(spacing: 12) {
@@ -26,6 +27,14 @@ struct BoardView: View {
           Image(systemName: model.isPinned ? "pin.fill" : "pin")
         }
         .help(model.isPinned ? "Let the bubble dodge again" : "Pin the bubble")
+
+        Button {
+          isShowingClearConfirmation = true
+        } label: {
+          Image(systemName: "trash")
+        }
+        .help("Clear the whiteboard")
+        .disabled(board.items.isEmpty)
 
         Button {
           model.quit()
@@ -85,6 +94,14 @@ struct BoardView: View {
         .stroke(Color.black.opacity(0.12), lineWidth: 1)
     }
     .shadow(color: .black.opacity(0.22), radius: 22, y: 10)
+    .alert("Clear the whiteboard?", isPresented: $isShowingClearConfirmation) {
+      Button("Cancel", role: .cancel) {}
+      Button("Clear All Lines", role: .destructive) {
+        board.clear()
+      }
+    } message: {
+      Text("This permanently deletes all \(board.items.count) lines. This cannot be undone.")
+    }
   }
 
   private func addDraft() {
