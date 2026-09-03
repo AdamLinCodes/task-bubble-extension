@@ -18,6 +18,7 @@ struct BubbleRootView: View {
       reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.55, dampingFraction: 0.78),
       value: model.surface
     )
+    .preferredColorScheme(.light)
     .contentShape(Rectangle())
   }
 
