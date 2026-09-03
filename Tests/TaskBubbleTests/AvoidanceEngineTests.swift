@@ -44,7 +44,7 @@ final class AvoidanceEngineTests: XCTestCase {
     XCTAssertEqual(destination, CGPoint(x: 12, y: 688))
   }
 
-  func testPushAtDisplayEdgeMovesOntoAdjacentDisplay() {
+  func testPushAtDisplayEdgeMovesToAdjacentDisplayCenter() {
     let leftDisplay = CGRect(x: -2_560, y: 131, width: 2_560, height: 1_440)
     let rightDisplay = CGRect(x: 0, y: 87, width: 1_710, height: 986)
     let panel = CGRect(x: 12, y: 300, width: 330, height: 250)
@@ -60,7 +60,7 @@ final class AvoidanceEngineTests: XCTestCase {
       now: now
     )
 
-    XCTAssertEqual(destination, CGPoint(x: -2_548, y: 300))
+    XCTAssertEqual(destination, CGPoint(x: -1_445, y: 726))
   }
 
   func testThreeDisplayLayoutMovesToTheNextDisplayWithoutSkippingIt() {
@@ -80,10 +80,10 @@ final class AvoidanceEngineTests: XCTestCase {
       now: now
     )
 
-    XCTAssertEqual(destination, CGPoint(x: -1_188, y: 300))
+    XCTAssertEqual(destination, CGPoint(x: -700, y: 400))
   }
 
-  func testCrossScreenMoveClampsOnlyTheOffsetAxis() {
+  func testVerticalCrossScreenMoveTargetsDestinationDisplayCenter() {
     let lowerDisplay = CGRect(x: 0, y: -500, width: 1_000, height: 500)
     let upperDisplay = CGRect(x: 0, y: 0, width: 1_000, height: 800)
     let panel = CGRect(x: 400, y: 12, width: 200, height: 100)
@@ -99,7 +99,7 @@ final class AvoidanceEngineTests: XCTestCase {
       now: now
     )
 
-    XCTAssertEqual(destination, CGPoint(x: 400, y: -488))
+    XCTAssertEqual(destination, CGPoint(x: 400, y: -300))
   }
 
   func testPushAgainstOuterEdgeSlidesAlongEdgeInsteadOfSticking() {

@@ -76,10 +76,21 @@ struct AvoidanceEngine: Sendable {
     visibleFrames: [CGRect],
     direction: CGVector
   ) -> CGPoint? {
-    visibleFrames
-      .compactMap {
+    let panelFrame = CGRect(origin: currentOrigin, size: panelSize)
+    let currentVisibleFrame = visibleFrames.max { lhs, rhs in
+      intersectionArea(of: lhs, with: panelFrame) < intersectionArea(of: rhs, with: panelFrame)
+    }
+
+    return
+      visibleFrames
+      .compactMap { visibleFrame in
         destinationOrigin(
-          in: $0, panelSize: panelSize, currentOrigin: currentOrigin, direction: direction)
+          in: visibleFrame,
+          panelSize: panelSize,
+          currentOrigin: currentOrigin,
+          direction: direction,
+          centersInDisplay: currentVisibleFrame.map { $0 != visibleFrame } ?? false
+        )
       }
       .filter { candidate in
         let delta = CGVector(
@@ -101,7 +112,8 @@ struct AvoidanceEngine: Sendable {
     in visibleFrame: CGRect,
     panelSize: CGSize,
     currentOrigin: CGPoint,
-    direction: CGVector
+    direction: CGVector,
+    centersInDisplay: Bool
   ) -> CGPoint? {
     let minX = visibleFrame.minX + edgeMargin
     let maxX = visibleFrame.maxX - panelSize.width - edgeMargin
@@ -109,6 +121,13 @@ struct AvoidanceEngine: Sendable {
     let maxY = visibleFrame.maxY - panelSize.height - edgeMargin
 
     guard minX <= maxX, minY <= maxY else { return nil }
+
+    if centersInDisplay {
+      return CGPoint(
+        x: visibleFrame.midX - (panelSize.width / 2),
+        y: visibleFrame.midY - (panelSize.height / 2)
+      )
+    }
 
     return CGPoint(
       x: destinationCoordinate(
@@ -180,6 +199,12 @@ struct AvoidanceEngine: Sendable {
     let dx = origin.x - point.x
     let dy = origin.y - point.y
     return (dx * dx) + (dy * dy)
+  }
+
+  private func intersectionArea(of frame: CGRect, with panelFrame: CGRect) -> CGFloat {
+    let intersection = frame.intersection(panelFrame)
+    guard !intersection.isNull else { return 0 }
+    return intersection.width * intersection.height
   }
 }
 

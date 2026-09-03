@@ -31,7 +31,7 @@ The build script creates a universal, ad-hoc signed local app for Apple silicon 
 ### Interaction
 
 - Approach the unpinned whiteboard or apple and it moves away from the contact side.
-- Keep nudging at a display edge to move the bubble onto an adjacent screen.
+- Keep nudging at a display edge to float the bubble to the center of an adjacent screen.
 - Hold `Option` while approaching it to suppress the dodge.
 - While holding `Option`, click the pin button to leave it in place for editing or timer controls.
 - Use the pin button or menu-bar item to let it roam again.
