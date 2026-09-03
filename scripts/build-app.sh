@@ -1,6 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+REQUIRED_TOOLS=(swift iconutil lipo codesign)
+MISSING_TOOLS=()
+
+for tool in "${REQUIRED_TOOLS[@]}"; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    MISSING_TOOLS+=("$tool")
+  fi
+done
+
+if (( ${#MISSING_TOOLS[@]} > 0 )); then
+  echo "Missing required Apple build tools: ${MISSING_TOOLS[*]}" >&2
+  echo "Install them with: xcode-select --install" >&2
+  exit 1
+fi
+
+MACOS_VERSION="$(sw_vers -productVersion)"
+MACOS_MAJOR_VERSION="${MACOS_VERSION%%.*}"
+if [[ ! "$MACOS_MAJOR_VERSION" =~ ^[0-9]+$ ]] || (( MACOS_MAJOR_VERSION < 14 )); then
+  echo "Task Bubble requires macOS 14 or newer; this Mac is running $MACOS_VERSION." >&2
+  exit 1
+fi
+
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 APP_DIR="$PROJECT_DIR/dist/Task Bubble.app"
 BUILD_TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/task-bubble-build.XXXXXX")"
