@@ -44,4 +44,28 @@ final class FocusTimerStoreTests: XCTestCase {
     XCTAssertEqual(restored.phase, .running)
     XCTAssertEqual(restored.remaining, 1_725, accuracy: 0.001)
   }
+
+  func testCompletionFeedbackFiresOncePerFinishedSession() {
+    let clock = TestClock(now: Date(timeIntervalSince1970: 3_000))
+    let timer = FocusTimerStore(
+      storage: TestDataStore(),
+      now: { clock.now },
+      startsTicker: false
+    )
+    var completionCount = 0
+    timer.onCompleted = { completionCount += 1 }
+
+    timer.start(duration: 1)
+    clock.now = clock.now.addingTimeInterval(1)
+    timer.refresh()
+    timer.refresh()
+
+    XCTAssertEqual(completionCount, 1)
+
+    timer.start(duration: 1)
+    clock.now = clock.now.addingTimeInterval(1)
+    timer.refresh()
+
+    XCTAssertEqual(completionCount, 2)
+  }
 }

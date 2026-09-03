@@ -33,4 +33,18 @@ final class AppModelTests: XCTestCase {
 
     XCTAssertTrue(didQuit)
   }
+
+  func testCompletedFocusIsPresentedAndPinned() {
+    let model = AppModel(
+      board: BoardStore(storage: TestDataStore()),
+      focus: FocusTimerStore(storage: TestDataStore(), startsTicker: false)
+    )
+    model.surface = .board
+    model.isPinned = false
+
+    model.presentCompletedFocus()
+
+    XCTAssertEqual(model.surface, .focus)
+    XCTAssertTrue(model.isPinned)
+  }
 }

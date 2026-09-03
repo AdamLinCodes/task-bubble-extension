@@ -3,6 +3,8 @@ import SwiftUI
 struct AppleTimerView: View {
   @ObservedObject var model: AppModel
   @ObservedObject var focus: FocusTimerStore
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  @State private var completionShake: CGFloat = 0
 
   var body: some View {
     ZStack {
@@ -101,6 +103,15 @@ struct AppleTimerView: View {
       .offset(x: -65, y: -58)
     }
     .frame(width: 210, height: 210)
+    .modifier(CompletionShakeEffect(progress: completionShake))
+    .task(id: focus.phase) {
+      guard focus.phase == .completed, !reduceMotion else { return }
+      await Task.yield()
+      guard !Task.isCancelled else { return }
+      withAnimation(.linear(duration: 0.45)) {
+        completionShake += 1
+      }
+    }
   }
 
   private var phaseLabel: String {
@@ -110,6 +121,20 @@ struct AppleTimerView: View {
     case .paused: "Paused"
     case .completed: "Complete"
     }
+  }
+}
+
+struct CompletionShakeEffect: GeometryEffect {
+  var progress: CGFloat
+
+  var animatableData: CGFloat {
+    get { progress }
+    set { progress = newValue }
+  }
+
+  func effectValue(size: CGSize) -> ProjectionTransform {
+    let horizontalOffset = 5 * sin(progress * .pi * 6)
+    return ProjectionTransform(CGAffineTransform(translationX: horizontalOffset, y: 0))
   }
 }
 

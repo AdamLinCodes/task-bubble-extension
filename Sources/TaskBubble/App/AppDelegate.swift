@@ -6,6 +6,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
   private var windowController: BubbleWindowController?
   private var statusItem: NSStatusItem?
   private var notificationScheduler: FocusNotificationScheduler?
+  private let completionSound = NSSound(named: NSSound.Name("Glass"))
 
   func applicationDidFinishLaunching(_ notification: Notification) {
     NSApp.setActivationPolicy(.accessory)
@@ -17,9 +18,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     model.focus.onDeadlineChanged = { [weak notificationScheduler] deadline in
       notificationScheduler?.schedule(at: deadline)
     }
-    model.focus.onCompleted = { [weak model, weak windowController] in
-      NSSound.beep()
-      model?.isPinned = true
+    model.focus.onCompleted = { [weak self, weak model, weak windowController] in
+      if self?.completionSound?.play() != true {
+        NSSound.beep()
+      }
+      model?.presentCompletedFocus()
       windowController?.show()
     }
     notificationScheduler.schedule(at: model.focus.deadline)
