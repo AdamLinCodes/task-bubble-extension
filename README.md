@@ -21,10 +21,14 @@ Flip the whiteboard into an apple to start a focused 30-minute session. The boar
 Task Bubble requires macOS 14 or newer and Xcode command-line tools.
 
 ```bash
+git clone https://github.com/AdamLinCodes/task-bubble-extension.git
+cd task-bubble-extension
 swift test
 ./scripts/build-app.sh
 open "dist/Task Bubble.app"
 ```
+
+If `swift` is unavailable, install Apple's build tools first with `xcode-select --install`. The generated `dist/Task Bubble.app` is intentionally not committed to Git, so every source clone must run `build-app.sh` before trying to open it.
 
 The build script creates a universal, ad-hoc signed local app for Apple silicon and Intel Macs. A Developer ID signature and notarization are needed before distributing it to other Macs without Gatekeeper warnings.
 
