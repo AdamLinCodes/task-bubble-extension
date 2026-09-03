@@ -1,44 +1,43 @@
-# Task Bubble Chrome Extension
+# Task Bubble
 
-I kept getting distracted and forgetting what I was doing so I vibe coded this Chrome extension to keep the task at hand visible.
+Task Bubble is a tiny macOS whiteboard that stays above ordinary app windows and playfully glides to another corner when your pointer gets close.
 
-## Features
+Flip the whiteboard into an apple to start a focused 30-minute session. The board remains intact while the timer runs.
 
-- Minimal floating task bubble on all pages
-- Bubble glides away when your cursor bumps into it
-- One add-tasks field, with one task per line
-- Separate queue and completed history panels
-- Done shortcut that advances to the next queued task
-- Draggable queue reordering with a handle
-- Built-in timer with pause/resume support
-- Gently pulsing active and paused status lights
-- Local persistence using extension storage
+## macOS v2
 
-## Default shortcuts
+- Always-on-top, borderless floating panel
+- Visible across desktop Spaces and alongside full-screen apps
+- Systemwide pointer avoidance with the original four-corner glide
+- Hold `Option` to catch the bubble, then use its pin button when you want to interact
+- Ordered whiteboard lines that remain in place when crossed out
+- 30-minute apple focus timer with pause, resume, reset, progress, sound, and notification
+- Timer deadlines persist through sleep and relaunch
+- Menu-bar controls and no Dock icon
+- Respects Reduce Motion
 
-- Add tasks: `Ctrl+Shift+Y` (`Control+Shift+Y` on macOS)
-- Toggle queue: `Ctrl+Shift+Q` (`Control+Shift+Q` on macOS)
-- Toggle history: `Ctrl+Shift+H` (`Control+Shift+H` on macOS)
-- Mark current task done: `Ctrl+Shift+D` (`Control+Shift+D` on macOS)
-- Pause or resume timer: `Ctrl+Shift+P` (`Control+Shift+P` on macOS)
+### Build and run
 
-You can change all shortcuts in Chrome at:
+Task Bubble requires macOS 14 or newer and Xcode command-line tools.
 
-`chrome://extensions/shortcuts`
+```bash
+swift test
+./scripts/build-app.sh
+open "dist/Task Bubble.app"
+```
 
-## Setup and use right away
+The build script creates a universal, ad-hoc signed local app for Apple silicon and Intel Macs. A Developer ID signature and notarization are needed before distributing it to other Macs without Gatekeeper warnings.
 
-1. Open `chrome://extensions`
-2. Enable **Developer mode**
-3. Click **Load unpacked**
-4. Select this folder
+### Interaction
 
-## Usage
+- Approach the unpinned whiteboard or apple and it glides to another corner.
+- Hold `Option` while approaching it to suppress the dodge.
+- While holding `Option`, click the pin button to leave it in place for editing or timer controls.
+- Use the pin button or menu-bar item to let it roam again.
+- Click the timer button on the whiteboard to flip into the apple and start 30 minutes.
+- Crossed-out lines stay on the board and can be restored by clicking the checkmark.
+- Right-click a line to delete it permanently.
 
-- Click the extension icon or use the add shortcut to add tasks
-- If there is no current task, the first added task becomes the active one
-- Additional tasks go into the queue
-- Use the queue shortcut to open the queued tasks panel
-- Drag queued tasks with the handle to reorder them
-- Use the history shortcut to open completed task history
-- Use the done shortcut to mark the current task complete and pull in the next queued task
+## Chrome extension v0.2
+
+The original Chrome extension remains in the repository as `manifest.json`, `background.js`, `content.js`, and `content.css`. It can still be loaded unpacked from `chrome://extensions`; v2 is the native macOS experience.
