@@ -54,6 +54,12 @@ final class BoardStore: ObservableObject {
     persist()
   }
 
+  func clear() {
+    guard !items.isEmpty else { return }
+    items = []
+    persist()
+  }
+
   private func persist() {
     guard let data = try? encoder.encode(items) else { return }
     storage.set(data, forKey: storageKey)

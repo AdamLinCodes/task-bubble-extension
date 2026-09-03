@@ -40,6 +40,7 @@ The build script creates a universal, ad-hoc signed local app for Apple silicon 
 - Click the timer button on the whiteboard to flip into the apple and start 30 minutes.
 - Crossed-out lines stay on the board and can be restored by clicking the checkmark.
 - Right-click a line to delete it permanently.
+- Use the trash button to clear the whole whiteboard after confirming the permanent deletion.
 
 ## Chrome extension v0.2
 
