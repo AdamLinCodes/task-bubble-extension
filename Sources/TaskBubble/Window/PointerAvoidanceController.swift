@@ -27,18 +27,12 @@ final class PointerAvoidanceController: NSObject {
   @objc private func checkPointer() {
     guard let panel, panel.isVisible else { return }
     let optionIsHeld = NSEvent.modifierFlags.contains(.option)
-    guard
-      let visibleFrame = panel.screen?.visibleFrame
-        ?? screenContaining(panel.frame.center)?.visibleFrame
-    else {
-      return
-    }
 
     guard
       let destination = engine.destination(
         pointer: NSEvent.mouseLocation,
         panelFrame: panel.frame,
-        visibleFrame: visibleFrame,
+        visibleFrames: NSScreen.screens.map(\.visibleFrame),
         isPinned: model.isPinned || optionIsHeld,
         isMoving: isMoving,
         lastMoveAt: lastMoveAt,
@@ -65,15 +59,5 @@ final class PointerAvoidanceController: NSObject {
       guard !Task.isCancelled else { return }
       self?.isMoving = false
     }
-  }
-
-  private func screenContaining(_ point: CGPoint) -> NSScreen? {
-    NSScreen.screens.first { $0.frame.contains(point) }
-  }
-}
-
-extension CGRect {
-  fileprivate var center: CGPoint {
-    CGPoint(x: midX, y: midY)
   }
 }
