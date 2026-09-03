@@ -1,6 +1,6 @@
 # Task Bubble
 
-Task Bubble is a tiny macOS whiteboard that stays above ordinary app windows and playfully glides to another corner when your pointer gets close.
+Task Bubble is a tiny macOS whiteboard that stays above ordinary app windows and playfully glides away from the side your pointer approaches.
 
 Flip the whiteboard into an apple to start a focused 30-minute session. The board remains intact while the timer runs.
 
@@ -8,7 +8,7 @@ Flip the whiteboard into an apple to start a focused 30-minute session. The boar
 
 - Always-on-top, borderless floating panel
 - Visible across desktop Spaces and alongside full-screen apps
-- Systemwide pointer avoidance with the original four-corner glide
+- Directional pointer avoidance that can cross connected displays
 - Hold `Option` to catch the bubble, then use its pin button when you want to interact
 - Ordered whiteboard lines that remain in place when crossed out
 - 30-minute apple focus timer with pause, resume, reset, progress, sound, and notification
@@ -30,7 +30,8 @@ The build script creates a universal, ad-hoc signed local app for Apple silicon 
 
 ### Interaction
 
-- Approach the unpinned whiteboard or apple and it glides to another corner.
+- Approach the unpinned whiteboard or apple and it moves away from the contact side.
+- Keep nudging at a display edge to float the bubble to the center of an adjacent screen.
 - Hold `Option` while approaching it to suppress the dodge.
 - While holding `Option`, click the pin button to leave it in place for editing or timer controls.
 - Use the pin button or menu-bar item to let it roam again.
