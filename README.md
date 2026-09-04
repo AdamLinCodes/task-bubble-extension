@@ -1,10 +1,20 @@
-# Task Bubble
+# Task Bubble 🍎
 
-Task Bubble is a tiny macOS whiteboard that stays above ordinary app windows and playfully glides away from the side your pointer approaches.
+<p align="center">
+  <strong>A tiny, mouse-shy whiteboard and Pomodoro timer for your Mac.</strong>
+</p>
 
-Flip the whiteboard into an apple to start a focused 30-minute session. The board remains intact while the timer runs.
+<p align="center">
+  <img src="docs/assets/task-bubble-demo.gif" alt="Task Bubble whiteboard lines being crossed off before the bubble flips into a 30-minute apple timer" width="900">
+</p>
 
-## macOS v2
+Task Bubble stays above ordinary app windows and playfully glides away from the
+side your pointer approaches. Catch it when you need it, write down whatever is
+on your mind, and cross things off without making them disappear. Then flip the
+whole bubble into an apple for a focused 30-minute session—your board will be
+waiting when you come back.
+
+## What it does
 
 - Always-on-top, borderless floating panel
 - Visible across desktop Spaces and alongside full-screen apps
